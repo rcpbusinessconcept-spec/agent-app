@@ -1,18 +1,25 @@
 'use client';
 import { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+// 1. Aici introduci datele tale din Supabase (luate din panoul tău)
+const supabaseUrl = 'https://idtknjvknusmufemmsym.supabase.co/rest/v1/';
+const supabaseKey = 'sb_publishable_zBiVDeI-sBrnrZhohbte4w_fkD3xFQw';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function AgentLogin() {
   const [pin, setPin] = useState('');
   const [error, setError] = useState(false);
+  const [agentName, setAgentName] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleNumberClick = (num) => {
-    if (pin.length < 4) {
+    if (pin.length < 4 && !loading) {
       const newPin = pin + num;
       setPin(newPin);
       
-      // Când s-au strâns 4 cifre, simulăm verificarea (ulterior o legăm de Supabase)
       if (newPin.length === 4) {
-        verifyPin(newPin);
+        verifyPinFromSupabase(newPin);
       }
     }
   };
@@ -20,20 +27,54 @@ export default function AgentLogin() {
   const handleClear = () => {
     setPin('');
     setError(false);
+    setAgentName('');
   };
 
-  const verifyPin = (enteredPin) => {
-    // Aici vom face cererea către Supabase. Pentru moment, testăm cu PIN-ul "1234"
-    if (enteredPin === '1234') {
-      alert('Autentificare reușită! Bun venit, agent.');
-    } else {
+  const verifyPinFromSupabase = async (enteredPin) => {
+    setLoading(true);
+    try {
+      // Căutăm în tabelul 'agents' din Supabase după PIN-ul introdus
+      const { data, error } = await supabase
+        .from('agents')
+        .select('nume, pin')
+        .eq('pin', enteredPin)
+        .single();
+
+      if (error || !data) {
+        setError(true);
+        setTimeout(() => {
+          setPin('');
+          setError(false);
+          setLoading(false);
+        }, 1200);
+      } else {
+        setAgentName(data.nume);
+        setLoading(false);
+      }
+    } catch (err) {
       setError(true);
       setTimeout(() => {
         setPin('');
         setError(false);
-      }, 1000);
+        setLoading(false);
+      }, 1200);
     }
   };
+
+  if (agentName) {
+    return (
+      <main style={styles.container}>
+        <div style={styles.card}>
+          <h1 style={styles.title}>Bun venit,</h1>
+          <h2 style={styles.welcomeName}>{agentName}!</h2>
+          <p style={styles.subtitle}>Autentificare reușită în sistem.</p>
+          <button onClick={handleClear} style={styles.logoutButton}>
+            Ieși din cont
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main style={styles.container}>
@@ -41,7 +82,7 @@ export default function AgentLogin() {
         <h1 style={styles.title}>RCP Agent</h1>
         <p style={styles.subtitle}>Introduceți codul PIN de 4 cifre</p>
 
-        {/* Afișaj cifre PIN (puncte sau numere) */}
+        {/* Afișaj cifre PIN */}
         <div style={styles.pinDisplay}>
           {[0, 1, 2, 3].map((index) => (
             <div 
@@ -56,6 +97,7 @@ export default function AgentLogin() {
         </div>
 
         {error && <p style={styles.errorText}>PIN incorect. Încercați din nou.</p>}
+        {loading && <p style={styles.loadingText}>Se verifică...</p>}
 
         {/* Tastatura numerică */}
         <div style={styles.keypad}>
@@ -64,23 +106,25 @@ export default function AgentLogin() {
               key={num}
               onClick={() => handleNumberClick(num.toString())}
               style={styles.keyButton}
+              disabled={loading}
             >
               {num}
             </button>
           ))}
-          <button onClick={handleClear} style={styles.keyButtonSpecial}>
+          <button onClick={handleClear} style={styles.keyButtonSpecial} disabled={loading}>
             Șterge
           </button>
           <button
             onClick={() => handleNumberClick('0')}
             style={styles.keyButton}
+            disabled={loading}
           >
             0
           </button>
           <button 
-            onClick={() => verifyPin(pin)} 
+            onClick={() => pin.length === 4 && verifyPinFromSupabase(pin)} 
             style={styles.keyButtonSubmit}
-            disabled={pin.length < 4}
+            disabled={pin.length < 4 || loading}
           >
             ➔
           </button>
@@ -115,6 +159,12 @@ const styles = {
     color: '#1f2937',
     marginBottom: '8px',
   },
+  welcomeName: {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#059669',
+    marginBottom: '16px',
+  },
   subtitle: {
     fontSize: '14px',
     color: '#6b7280',
@@ -136,6 +186,11 @@ const styles = {
   },
   errorText: {
     color: '#ef4444',
+    fontSize: '13px',
+    marginBottom: '16px',
+  },
+  loadingText: {
+    color: '#059669',
     fontSize: '13px',
     marginBottom: '16px',
   },
@@ -173,4 +228,14 @@ const styles = {
     color: '#ffffff',
     cursor: 'pointer',
   },
+  logoutButton: {
+    backgroundColor: '#ef4444',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '8px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    cursor: 'pointer',
+    marginTop: '16px',
+  }
 };
