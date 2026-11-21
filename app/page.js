@@ -16,13 +16,13 @@ export default function AgentLogin() {
   const [loading, setLoading] = useState(true);
   const [verifying, setVerifying] = useState(false);
 
-  // 1. Încărcăm lista de agenți din baza de date când se deschide pagina
+  // Încărcăm lista de agenți din baza de date când se deschide pagina
   useEffect(() => {
     async function fetchAgents() {
       try {
         const { data, error } = await supabase
           .from('agents')
-          .select('id, nume'); // Presupunem că ai coloanele id și nume
+          .select('id, nume'); 
         
         if (error) {
           console.error('Eroare la preluarea agenților:', error);
@@ -64,7 +64,6 @@ export default function AgentLogin() {
   const verifyPin = async (enteredPin) => {
     setVerifying(true);
     try {
-      // Verificăm dacă PIN-ul introdus corespunde agentului selectat
       const { data, error } = await supabase
         .from('agents')
         .select('*')
@@ -100,7 +99,6 @@ export default function AgentLogin() {
     setError(false);
   };
 
-  // Ecranul de succes după logare
   if (isLoggedIn && selectedAgent) {
     return (
       <main style={styles.container}>
@@ -116,7 +114,6 @@ export default function AgentLogin() {
     );
   }
 
-  // Ecranul 2: Introducerea PIN-ului pentru agentul selectat
   if (selectedAgent) {
     return (
       <main style={styles.container}>
@@ -175,7 +172,6 @@ export default function AgentLogin() {
     );
   }
 
-  // Ecranul 1: Lista cu agenți preluați din baza de date
   return (
     <main style={styles.container}>
       <div style={styles.card}>
@@ -218,4 +214,121 @@ const styles = {
     backgroundColor: '#ffffff',
     padding: '24px',
     borderRadius: '16px',
-    boxShadow: '0 4px 6px -1px rgba(0, 0, 0,
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+    width: '100%',
+    maxWidth: '360px',
+    textAlign: 'center',
+  },
+  title: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    color: '#1f2937',
+    marginBottom: '8px',
+  },
+  welcomeName: {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    color: '#059669',
+    marginBottom: '16px',
+  },
+  subtitle: {
+    fontSize: '14px',
+    color: '#6b7280',
+    marginBottom: '20px',
+  },
+  agentList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    maxHeight: '300px',
+    overflowY: 'auto',
+  },
+  agentButton: {
+    backgroundColor: '#f9fafb',
+    border: '1px solid #e5e7eb',
+    borderRadius: '10px',
+    padding: '14px',
+    fontSize: '16px',
+    fontWeight: '600',
+    color: '#1f2937',
+    cursor: 'pointer',
+    textAlign: 'left',
+  },
+  backButton: {
+    background: 'none',
+    border: 'none',
+    color: '#4b5563',
+    fontSize: '14px',
+    cursor: 'pointer',
+    marginBottom: '12px',
+    alignSelf: 'flex-start',
+  },
+  pinDisplay: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '16px',
+    marginBottom: '24px',
+  },
+  pinDot: {
+    width: '16px',
+    height: '16px',
+    borderRadius: '50%',
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    transition: 'all 0.2s',
+  },
+  errorText: {
+    color: '#ef4444',
+    fontSize: '13px',
+    marginBottom: '16px',
+  },
+  loadingText: {
+    color: '#059669',
+    fontSize: '13px',
+    marginBottom: '16px',
+  },
+  keypad: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '12px',
+  },
+  keyButton: {
+    backgroundColor: '#f9fafb',
+    border: '1px solid #e5e7eb',
+    borderRadius: '12px',
+    padding: '16px',
+    fontSize: '20px',
+    fontWeight: '600',
+    color: '#1f2937',
+    cursor: 'pointer',
+  },
+  keyButtonSpecial: {
+    backgroundColor: '#f3f4f6',
+    border: '1px solid #e5e7eb',
+    borderRadius: '12px',
+    padding: '16px',
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#4b5563',
+    cursor: 'pointer',
+  },
+  keyButtonSubmit: {
+    backgroundColor: '#059669',
+    border: 'none',
+    borderRadius: '12px',
+    padding: '16px',
+    fontSize: '20px',
+    color: '#ffffff',
+    cursor: 'pointer',
+  },
+  logoutButton: {
+    backgroundColor: '#ef4444',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '8px',
+    padding: '10px 20px',
+    fontSize: '14px',
+    cursor: 'pointer',
+    marginTop: '16px',
+  }
+};
