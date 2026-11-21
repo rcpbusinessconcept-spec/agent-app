@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
 // 1. Aici introduci datele tale din Supabase (luate din panoul tău)
-const supabaseUrl = 'https://idtknjvknusmufemmsym.supabase.co/rest/v1/';
-const supabaseKey = 'sb_publishable_zBiVDeI-sBrnrZhohbte4w_fkD3xFQw';
+const supabaseUrl = https://idtknjvknusmufemmsym.supabase.co/rest/v1/;
+const supabaseKey = sb_publishable_zBiVDeI-sBrnrZhohbte4w_fkD3xFQw;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function AgentLogin() {
